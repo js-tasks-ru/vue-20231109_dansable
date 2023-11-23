@@ -1,4 +1,5 @@
-// import { createApp } from './vendor/vue.esm-browser.js';
+import {createApp} from './vendor/vue.esm-browser.js';
+import {defineComponent} from "../02-VueCalculator/vendor/vue.esm-browser";
 
 // From https://jsonplaceholder.typicode.com/comments
 const emails = [
@@ -29,4 +30,34 @@ const emails = [
   'Isaias_Kuhic@jarrett.net',
 ];
 
+const App = defineComponent({
+  name: 'App',
+
+  data() {
+    return {
+      emails: emails,
+      search: ''
+    }
+  },
+
+  computed: {
+    //data-driven approach
+    markedEmails() {
+      return this.emails.map(email => {
+        return {
+          name: email,
+          marked: this.isMarked(email)
+        };
+      });
+    },
+  },
+
+  methods: {
+    isMarked(string) {
+      return this.search != null && this.search != '' && string?.toLocaleLowerCase().includes(this.search.toLowerCase());
+    }
+  }
+});
+
 // Требуется создать Vue приложение
+createApp(App).mount('#app');
