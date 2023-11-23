@@ -1,5 +1,4 @@
-import {createApp} from './vendor/vue.esm-browser.js';
-import {defineComponent} from "./vendor/vue.esm-browser";
+import {createApp, defineComponent} from './vendor/vue.esm-browser.js';
 
 const operatorsMap = {
   sum: 'sum',
@@ -10,6 +9,8 @@ const operatorsMap = {
 
 // Создайте Vue приложение
 const App = defineComponent({
+  name: 'App',
+
   operatorsMap: operatorsMap,
 
   data() {

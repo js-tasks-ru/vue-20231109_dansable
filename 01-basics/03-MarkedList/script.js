@@ -1,5 +1,4 @@
-import {createApp} from './vendor/vue.esm-browser.js';
-import {defineComponent} from "../02-VueCalculator/vendor/vue.esm-browser";
+import {createApp, defineComponent} from './vendor/vue.esm-browser.js';
 
 // From https://jsonplaceholder.typicode.com/comments
 const emails = [
