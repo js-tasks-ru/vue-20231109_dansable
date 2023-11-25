@@ -16,6 +16,10 @@ export default defineComponent({
   },
 
   computed: {
+    isoDate() {
+      return new Date(this.date).toISOString().substring(0, 10);
+    },
+
     formattedDate() {
       return new Date(this.date).toLocaleDateString(navigator.language, {
         dateStyle: 'long'
@@ -35,7 +39,7 @@ export default defineComponent({
       </li>
       <li>
         <img class="icon meetup-info__icon" alt="icon" src="/assets/icons/icon-cal-lg.svg"/>
-        <time datetime="2020-01-01">{{ formattedDate }}</time>
+        <time :datetime="isoDate">{{ formattedDate }}</time>
       </li>
     </ul>`,
 });
