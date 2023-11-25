@@ -11,7 +11,7 @@ export default defineComponent({
       type: String,
     },
     date: {
-      type: Date,
+      type: Number,
     },
   },
 
