@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { isAuthenticated } from '../services/authService.js';
+import { canAccessOrRedirect } from "../services/permissionsService";
 
 const router = createRouter({
   history: createWebHistory('/05-vue-router/05-AuthGuard'),
@@ -7,10 +7,12 @@ const router = createRouter({
     {
       path: '/',
       alias: '/meetups',
+      name: 'index',
       component: () => import('../views/PageMeetups.vue'),
     },
     {
       path: '/login',
+      name: 'login',
       meta: {
         requireGuest: true,
       },
@@ -38,6 +40,10 @@ const router = createRouter({
       component: () => import('../views/PageEditMeetup.vue'),
     },
   ],
+});
+
+router.beforeEach((to, from) => {
+  return canAccessOrRedirect(to);
 });
 
 export { router };
