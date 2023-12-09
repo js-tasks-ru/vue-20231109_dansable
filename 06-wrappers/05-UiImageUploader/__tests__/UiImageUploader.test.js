@@ -1,5 +1,5 @@
 const UiImageUploader = require(global.getSolutionPath('components/UiImageUploader.vue')).default;
-import { shallowMount, flushPromises } from '@vue/test-utils';
+import { flushPromises, shallowMount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 
 if (window.URL.createObjectURL === undefined || window.URL.revokeObjectURL === undefined) {
@@ -12,10 +12,12 @@ if (window.URL.createObjectURL === undefined || window.URL.revokeObjectURL === u
 function createInputFileMock(input) {
   let FileBrowseMock;
   let fileValue = '';
+  let filType = 'image/png';
 
   Object.defineProperty(input.element, 'files', {
     get: (FileBrowseMock = jest.fn()),
-    set: () => {},
+    set: () => {
+    },
   });
 
   Object.defineProperty(input.element, 'value', {
@@ -27,7 +29,7 @@ function createInputFileMock(input) {
 
   return async () => {
     fileValue = '/fake_path/image.png';
-    const file = new File([], 'image.png');
+    const file = new File([], 'image.png', { type: filType });
     FileBrowseMock.mockReturnValue([file]);
     await Promise.all([input.trigger('input'), input.trigger('change')]);
     return { file };

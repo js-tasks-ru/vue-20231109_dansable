@@ -1,13 +1,31 @@
 <template>
-  <div class="input-group input-group_icon input-group_icon-left input-group_icon-right">
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+  <div class="input-group" :class="inputGroupClass()">
+    <div v-if="hasLeftIcon()" class="input-group__icon">
+      <slot name="left-icon" />
     </div>
 
-    <input ref="input" class="form-control form-control_rounded form-control_sm" />
+    <textarea
+      ref="input"
+      v-if="multiline"
+      class="form-control"
+      :class="formControlClass"
+      :value="modelValue"
+      @[eventName]="updateValue"
+      v-bind="$attrs"
+    ></textarea>
 
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+    <input
+      ref="input"
+      v-else
+      class="form-control"
+      :class="formControlClass"
+      :value="modelValue"
+      @[eventName]="updateValue"
+      v-bind="$attrs"
+    />
+
+    <div v-if="hasRightIcon()" class="input-group__icon">
+      <slot name="right-icon" />
     </div>
   </div>
 </template>
@@ -15,6 +33,67 @@
 <script>
 export default {
   name: 'UiInput',
+
+  inheritAttrs: false,
+
+  props: {
+    modelValue: String,
+    small: Boolean,
+    rounded: Boolean,
+    multiline: Boolean,
+  },
+
+  expose: ['focus'],
+
+  emits: {
+    'update:modelValue': null,
+  },
+
+  computed: {
+    /*what do you think about such approach?
+   * Is extraction of logic out of the template is worth it? Or it's better to keep it in the template?
+   * Based on preferences of the team this could increase the readability of the template.
+   * But it could also make it harder to understand the component the start, because we mix the decalrative and imperative approaches.
+   * */
+    formControlClass() {
+      return {
+        'form-control_rounded': this.rounded,
+        'form-control_sm': this.small,
+      };
+    },
+
+    eventName() {
+      return this.$attrs.modelModifiers?.lazy ? 'change' : 'input';
+    },
+  },
+
+
+  methods: {
+    focus() {
+      this.$refs.input.focus();
+    },
+    updateValue(event) {
+      this.$emit('update:modelValue', event.target.value);
+    },
+    hasLeftIcon() {
+      return !!this.$slots['left-icon'];
+    },
+    hasRightIcon() {
+      return !!this.$slots['right-icon'];
+    },
+    /*what do you think about such approach?
+    * Is extraction of logic out of the template is worth it? Or it's better to keep it in the template?
+    * Based on preferences of the team this could increase the readability of the template.
+    * But it could also make it harder to understand the component the start, because we mix the decalrative and imperative approaches.
+    * */
+    inputGroupClass() {
+      return {
+        'input-group_icon-left': this.hasLeftIcon(),
+        'input-group_icon-right': this.hasRightIcon(),
+        'input-group_icon': this.hasLeftIcon() || this.hasRightIcon(),
+      };
+    },
+  },
 };
 </script>
 

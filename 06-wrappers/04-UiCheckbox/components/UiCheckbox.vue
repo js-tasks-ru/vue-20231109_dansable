@@ -1,14 +1,40 @@
 <template>
   <label class="checkbox">
-    <input type="checkbox" class="checkbox__input" />
+    <input
+      v-model="modelProxy"
+      v-bind="$attrs"
+      type="checkbox"
+      class="checkbox__input"
+    />
     <span class="checkbox__box"></span>
-    Label Text
+    <slot />
   </label>
 </template>
 
 <script>
 export default {
   name: 'UiCheckbox',
+
+  inheritAttrs: false,
+
+  props: {
+    modelValue: {
+      type: [Boolean, Array, Set],
+    },
+  },
+
+  emits: ['update:modelValue'],
+
+  computed: {
+    modelProxy: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      },
+    },
+  }
 };
 </script>
 
