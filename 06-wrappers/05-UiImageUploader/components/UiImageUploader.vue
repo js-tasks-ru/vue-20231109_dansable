@@ -104,14 +104,18 @@ export default {
       }
     },
     removeImage(e) {
-      if (!this.previewUrl || this.loading) {
+      if (this.loading) {
+        e.preventDefault();
         return;
       }
 
-      this.errorMessage = null;
+      if (!this.previewUrl) {
+        return;
+      }
 
       e.preventDefault();
-      e.stopPropagation();
+
+      this.errorMessage = null;
 
       const fileInput = e.target;
 

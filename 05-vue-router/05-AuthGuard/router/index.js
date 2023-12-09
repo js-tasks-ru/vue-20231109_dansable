@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { canAccessOrRedirect } from "../services/permissionsService";
+import { canAccessGuard } from "../services/canAccessGuard";
 
 const router = createRouter({
   history: createWebHistory('/05-vue-router/05-AuthGuard'),
@@ -43,7 +43,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  return canAccessOrRedirect(to);
+  return canAccessGuard(to);
 });
 
 export { router };
