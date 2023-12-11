@@ -18,10 +18,11 @@ export default defineComponent({
 
 <template>
   <div class="toasts" v-if="toasts.length">
-    <slot v-for="toast in toasts"
-          :key="toast.id"
-          name="toast"
-          v-bind="toast"/>
+    <slot
+      v-for="toast in toasts"
+      :key="toast.id"
+      v-bind="{toast}"
+    />
   </div>
 </template>
 

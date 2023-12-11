@@ -2,29 +2,35 @@
   <div class="calendar-view">
     <div class="calendar-view__controls">
       <div class="calendar-view__controls-inner">
-        <button @click="prev"
-                class="calendar-view__control-left"
-                type="button"
-                aria-label="Previous month"></button>
+        <button
+          @click.stop="prev"
+          class="calendar-view__control-left"
+          type="button"
+          aria-label="Previous month"
+        ></button>
         <div class="calendar-view__date">{{ localizedDate }}</div>
-        <button @click="next" class="calendar-view__control-right" type="button" aria-label="Next month"></button>
+        <button @click.stop="next" class="calendar-view__control-right" type="button" aria-label="Next month"></button>
       </div>
     </div>
 
     <div class="calendar-view__grid">
-      <div v-for="day in days"
-           :key="day.id"
-           class="calendar-view__cell"
-           :class="{
+      <div
+        v-for="day in days"
+        :key="day.id"
+        class="calendar-view__cell"
+        :class="{
                 'calendar-view__cell_inactive': !day.active
            }"
-           tabindex="0">
+        tabindex="0"
+      >
         <div class="calendar-view__cell-day">{{ day.day }}</div>
         <div class="calendar-view__cell-content">
-          <a v-for="event in day.events"
-             :key="event.id"
-             :href="`/meetups/${event.id}`"
-             class="calendar-event">
+          <a
+            v-for="event in day.events"
+            :key="event.id"
+            :href="`/meetups/${event.id}`"
+            class="calendar-event"
+          >
             {{ event.title }}
           </a>
         </div>
@@ -49,7 +55,6 @@ export default {
   data() {
     return {
       date: new Date(),
-      days: [],
     };
   },
 
@@ -60,27 +65,17 @@ export default {
         year: 'numeric',
       });
     },
-  },
-
-  watch: {
-    date: {
-      immediate: true,
-      handler() {
-        this.days = this.generateCalendarDays();
-      }
+    days() {
+      return this.generateCalendarDays();
     }
   },
 
   methods: {
-    prev(e) {
-      e.stopPropagation();
-
+    prev() {
       this.date = new Date(this.date.getFullYear(), this.date.getMonth() - 1, 1);
     },
 
-    next(e) {
-      e.stopPropagation();
-
+    next() {
       this.date = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 1);
     },
 

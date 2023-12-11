@@ -6,7 +6,6 @@
             button_block: block
           }]"
     :type="tag === 'button' ? 'button' : undefined"
-    v-bind="$attrs"
   >
     <slot />
   </component>
@@ -22,7 +21,6 @@ export default {
 
   name: 'UiButton',
 
-  inheritAttrs: false,
 
   buttonVariants,
 

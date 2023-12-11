@@ -1,11 +1,12 @@
 <template>
   <UiToasts :toasts="toasts">
-    <template #toast="toast">
-      <UiToast :message="toast.message"
-               :closable="toast.closable"
-               :cssClass="$options.cssClassMap[toast.type]"
-               :icon="$options.iconMap[toast.type]"
-               @close="clearToast(toast)"/>
+    <template #default="{toast}">
+      <UiToast
+        :type="toast.type"
+        :message="toast.message"
+        :closable="toast.closable"
+        @close="clearToast(toast)"
+      />
     </template>
   </UiToasts>
 </template>
@@ -14,28 +15,16 @@
 import UiIcon from './UiIcon.vue';
 import UiToast from "./UiToast.vue";
 import UiToasts from "./UiToasts.vue";
-import {nanoid} from "nanoid";
+import { nanoid } from "nanoid";
 
 export default {
   name: 'TheToaster',
 
-  components: {UiIcon, UiToast, UiToasts},
+  components: { UiIcon, UiToast, UiToasts },
 
   defaults: {
     duration: 5000,
     closable: false,
-  },
-
-  iconMap: {
-    success: 'check-circle',
-    error: 'alert-circle',
-    info: 'tv'
-  },
-
-  cssClassMap: {
-    success: 'toast_success',
-    error: 'toast_error',
-    info: 'toast_info'
   },
 
   data() {
@@ -72,7 +61,7 @@ export default {
     },
 
     handleState(state, message, options) {
-      options = {...this.$options.defaults, ...options};
+      options = { ...this.$options.defaults, ...options };
 
       const toast = this.createToast(state, message, options.closable);
 
@@ -94,17 +83,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.toast.toast_success {
-  color: var(--green);
-}
-
-.toast.toast_error {
-  color: var(--red);
-}
-
-.toast.toast_info {
-  color: var(--blue-2);
-}
-</style>

@@ -1,24 +1,24 @@
 <template>
-  <div class="input-group" :class="inputGroupClass()">
+  <div
+    class="input-group"
+    :class="{
+      'input-group_icon-left': hasLeftIcon(),
+      'input-group_icon-right': hasRightIcon(),
+      'input-group_icon': hasLeftIcon() || hasRightIcon(),
+    }"
+  >
     <div v-if="hasLeftIcon()" class="input-group__icon">
       <slot name="left-icon" />
     </div>
 
-    <textarea
+    <component
+      :is="multiline ? 'textarea' : 'input'"
       ref="input"
-      v-if="multiline"
       class="form-control"
-      :class="formControlClass"
-      :value="modelValue"
-      @[eventName]="updateValue"
-      v-bind="$attrs"
-    ></textarea>
-
-    <input
-      ref="input"
-      v-else
-      class="form-control"
-      :class="formControlClass"
+      :class="{
+        'form-control_rounded': this.rounded,
+        'form-control_sm': this.small,
+      }"
       :value="modelValue"
       @[eventName]="updateValue"
       v-bind="$attrs"
@@ -50,23 +50,10 @@ export default {
   },
 
   computed: {
-    /*what do you think about such approach?
-   * Is extraction of logic out of the template is worth it? Or it's better to keep it in the template?
-   * Based on preferences of the team this could increase the readability of the template.
-   * But it could also make it harder to understand the component the start, because we mix the decalrative and imperative approaches.
-   * */
-    formControlClass() {
-      return {
-        'form-control_rounded': this.rounded,
-        'form-control_sm': this.small,
-      };
-    },
-
     eventName() {
       return this.$attrs.modelModifiers?.lazy ? 'change' : 'input';
     },
   },
-
 
   methods: {
     focus() {
@@ -80,18 +67,6 @@ export default {
     },
     hasRightIcon() {
       return !!this.$slots['right-icon'];
-    },
-    /*what do you think about such approach?
-    * Is extraction of logic out of the template is worth it? Or it's better to keep it in the template?
-    * Based on preferences of the team this could increase the readability of the template.
-    * But it could also make it harder to understand the component the start, because we mix the decalrative and imperative approaches.
-    * */
-    inputGroupClass() {
-      return {
-        'input-group_icon-left': this.hasLeftIcon(),
-        'input-group_icon-right': this.hasRightIcon(),
-        'input-group_icon': this.hasLeftIcon() || this.hasRightIcon(),
-      };
     },
   },
 };

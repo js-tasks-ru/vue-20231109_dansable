@@ -1,22 +1,26 @@
 <script>
-import {defineComponent} from 'vue';
+import { defineComponent } from 'vue';
 import UiIcon from './UiIcon.vue';
+
+const iconMap = {
+  success: 'check-circle',
+  error: 'alert-circle',
+  info: 'tv'
+};
+
+const cssClassMap = {
+  success: 'toast_success',
+  error: 'toast_error',
+  info: 'toast_info'
+};
 
 export default defineComponent({
   name: 'UiToast',
 
-  components: {UiIcon},
+  components: { UiIcon },
 
   props: {
-    icon: {
-      type: String,
-      required: true,
-    },
     message: {
-      type: String,
-      required: true,
-    },
-    cssClass: {
       type: String,
       required: true,
     },
@@ -24,14 +28,26 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    type: {
+      type: String,
+      required: true,
+      validator: (type) => Object.keys(cssClassMap).includes(type),
+    },
   },
 
   emits: ['close'],
 
-  methods: {
-    close(event) {
-      event.stopPropagation();
+  computed: {
+    icon() {
+      return iconMap[this.type];
+    },
+    typeClass() {
+      return cssClassMap[this.type];
+    },
+  },
 
+  methods: {
+    close() {
       this.$emit('close');
     },
   },
@@ -39,13 +55,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="toast" :class="cssClass">
-    <UiIcon class="toast__icon" :icon="icon"/>
+  <div class="toast" :class="typeClass">
+    <UiIcon class="toast__icon" :icon="icon" />
     <span>{{ message }}</span>
-    <button v-if="closable"
-            @click="close($event)"
-            type="button"
-            class="button toast-close">
+    <button
+      v-if="closable"
+      @click.stop="close($event)"
+      type="button"
+      class="button toast-close"
+    >
       &times;
     </button>
   </div>
@@ -78,5 +96,17 @@ export default defineComponent({
   padding: 0;
   margin-left: 10px;
   border: 0;
+}
+
+.toast.toast_success {
+  color: var(--green);
+}
+
+.toast.toast_error {
+  color: var(--red);
+}
+
+.toast.toast_info {
+  color: var(--blue-2);
 }
 </style>

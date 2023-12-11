@@ -1,46 +1,58 @@
 <template>
-  <div class="dropdown" :class="{
+  <div
+    class="dropdown" :class="{
     dropdown_opened: opened,
-  }">
-    <button type="button"
-            @click="toggle"
-            class="dropdown__toggle"
-            :class="{
+  }"
+  >
+    <button
+      type="button"
+      @click.stop="toggle"
+      class="dropdown__toggle"
+      :class="{
                 dropdown__toggle_icon: hasIcon,
-              }">
+              }"
+    >
       <template v-if="selectedOption">
-        <UiIcon v-if="selectedOption.icon"
-                :icon="selectedOption.icon"
-                class="dropdown__icon"/>
+        <UiIcon
+          v-if="selectedOption.icon"
+          :icon="selectedOption.icon"
+          class="dropdown__icon"
+        />
         {{ selectedOption.text }}
       </template>
       <span v-else>{{ title }}</span>
     </button>
 
     <div class="dropdown__menu" role="listbox" v-show="opened">
-      <button v-for="option in options"
-              :key="option.value"
-              @click="select(option.value)"
-              class="dropdown__item"
-              :class="{
+      <button
+        v-for="option in options"
+        :key="option.value"
+        @click="select(option.value)"
+        class="dropdown__item"
+        :class="{
                 dropdown__item_icon: hasIcon,
               }"
-              role="option"
-              type="button">
-        <UiIcon :icon="option.icon" v-if="option.icon" class="dropdown__icon"/>
+        role="option"
+        type="button"
+      >
+        <UiIcon :icon="option.icon" v-if="option.icon" class="dropdown__icon" />
         {{ option.text }}
       </button>
     </div>
   </div>
 
   <div class="hidden">
-    <select :name="title"
-            :id="$options.id"
-            :value="modelValue"
-            @change="$emit('update:modelValue', $event.target.value)">
-      <option v-for="option in options"
-              :key="option.value"
-              :value="option.value">{{ option.text }}
+    <select
+      :name="title"
+      :id="$options.id"
+      :value="modelValue"
+      @change="$emit('update:modelValue', $event.target.value)"
+    >
+      <option
+        v-for="option in options"
+        :key="option.value"
+        :value="option.value"
+      >{{ option.text }}
       </option>
     </select>
   </div>
@@ -87,9 +99,7 @@ export default {
   },
 
   methods: {
-    toggle(event) {
-      event.stopPropagation();
-
+    toggle() {
       this.opened = !this.opened;
     },
     select(value) {
