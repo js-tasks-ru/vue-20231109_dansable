@@ -1,8 +1,23 @@
 <template>
+  <div v-if="errorMessage" class="error">{{ errorMessage }}
+  </div>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{
+        'image-uploader__preview-loading': loading
+      }"
+      :style="previewStyle"
+    >
+      <span class="image-uploader__text">{{ labelText }}</span>
+      <input
+        @change="fileChange"
+        @click="removeImage"
+        v-bind="$attrs"
+        type="file"
+        accept="image/*"
+        class="image-uploader__input"
+      />
     </label>
   </div>
 </template>
@@ -10,6 +25,116 @@
 <script>
 export default {
   name: 'UiImageUploader',
+
+  inheritAttrs: false,
+
+  props: {
+    preview: {
+      type: String,
+    },
+
+    uploader: {
+      type: Function,
+    },
+  },
+
+  emits: {
+    select: null,
+    upload: null,
+    error: null,
+    remove: null,
+  },
+
+  data() {
+    return {
+      previewUrl: this.preview,
+      loading: false,
+      errorMessage: null,
+    }
+  },
+
+  computed: {
+    previewStyle() {
+      return this.previewUrl ? `--bg-url: url('${this.previewUrl}')` : '';
+    },
+    labelText() {
+      if (this.loading) {
+        return "Загрузка...";
+      }
+
+      return this.previewUrl ? 'Удалить изображение' : 'Загрузить изображение';
+    }
+  },
+
+  methods: {
+    async fileChange(e) {
+      const fileInput = e.target;
+      const file = fileInput.files[0];
+
+      this.errorMessage = null;
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        this.errorMessage = 'Invalid file type. Please select an image.';
+        return;
+      }
+
+      this.$emit('select', file);
+
+      this.previewUrl = URL.createObjectURL(file);
+
+      if (this.uploader) {
+        this.loading = true;
+
+        try {
+          const response = await this.uploader(file);
+
+          this.$emit('upload', response);
+        } catch (error) {
+          this.reset(fileInput);
+
+          this.$emit('error', error);
+          this.errorMessage = error.message;
+        } finally {
+          this.loading = false;
+        }
+      }
+    },
+    removeImage(e) {
+      if (this.loading) {
+        e.preventDefault();
+        return;
+      }
+
+      if (!this.previewUrl) {
+        return;
+      }
+
+      e.preventDefault();
+
+      this.errorMessage = null;
+
+      const fileInput = e.target;
+
+      this.reset(fileInput);
+
+      this.$emit('remove');
+    },
+    reset(fileInput) {
+      this.resetState();
+      this.clearFileInput(fileInput);
+    },
+    resetState() {
+      this.previewUrl = null;
+    },
+    clearFileInput(fileInput) {
+      fileInput.value = null;
+      fileInput.files = null;
+    }
+  }
 };
 </script>
 

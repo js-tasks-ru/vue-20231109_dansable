@@ -1,38 +1,78 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button
+      type="button"
+      class="agenda-item-form__remove-button"
+      @click="$emit('remove')"
+    >
       <UiIcon icon="trash" />
     </button>
 
     <UiFormGroup>
-      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <UiDropdown
+        title="Тип"
+        :options="$options.agendaItemTypeOptions"
+        name="type"
+        v-model="internalAgendaItem.type"
+      />
     </UiFormGroup>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <UiFormGroup label="Начало">
-          <UiInput type="time" placeholder="00:00" name="startsAt" />
+          <UiInput
+            type="time"
+            placeholder="00:00"
+            name="startsAt"
+            v-model="internalAgendaItem.startsAt"
+          />
         </UiFormGroup>
       </div>
       <div class="agenda-item-form__col">
         <UiFormGroup label="Окончание">
-          <UiInput type="time" placeholder="00:00" name="endsAt" />
+          <UiInput
+            type="time"
+            placeholder="00:00"
+            name="endsAt" v-model="internalAgendaItem.endsAt"
+          />
         </UiFormGroup>
       </div>
     </div>
 
-    <UiFormGroup label="Тема">
-      <UiInput name="title" />
-    </UiFormGroup>
-    <UiFormGroup label="Докладчик">
-      <UiInput name="speaker" />
-    </UiFormGroup>
-    <UiFormGroup label="Описание">
-      <UiInput multiline name="description" />
-    </UiFormGroup>
-    <UiFormGroup label="Язык">
-      <UiDropdown title="Язык" :options="$options.talkLanguageOptions" name="language" />
-    </UiFormGroup>
+    <template v-if="internalAgendaItem.type === 'talk'">
+      <UiFormGroup label="Тема">
+        <UiInput name="title" v-model="internalAgendaItem.title" />
+      </UiFormGroup>
+      <UiFormGroup label="Докладчик">
+        <UiInput name="speaker" v-model="internalAgendaItem.speaker" />
+      </UiFormGroup>
+      <UiFormGroup label="Описание">
+        <UiInput multiline name="description" v-model="internalAgendaItem.description" />
+      </UiFormGroup>
+      <UiFormGroup label="Язык">
+        <UiDropdown
+          title="Язык"
+          :options="$options.talkLanguageOptions"
+          name="language"
+          v-model="internalAgendaItem.language"
+        />
+      </UiFormGroup>
+    </template>
+    <template v-if="internalAgendaItem.type === 'other'">
+      <UiFormGroup label="Заголовок">
+        <UiInput name="title" v-model="internalAgendaItem.title" />
+      </UiFormGroup>
+      <UiFormGroup label="Описание">
+        <UiInput multiline name="description" v-model="internalAgendaItem.description" />
+      </UiFormGroup>
+    </template>
+    <template v-if="internalAgendaItem.type !== 'other' && internalAgendaItem.type !== 'talk'">
+      <UiFormGroup label="Нестандартный текст (необязательно)">
+        <UiInput name="title" v-model="internalAgendaItem.title" />
+      </UiFormGroup>
+    </template>
+
+
   </fieldset>
 </template>
 
@@ -41,6 +81,7 @@ import UiIcon from './UiIcon.vue';
 import UiFormGroup from './UiFormGroup.vue';
 import UiInput from './UiInput.vue';
 import UiDropdown from './UiDropdown.vue';
+import { getTimeInMinutes, getTimeString } from "../utils/time";
 
 const agendaItemTypeIcons = {
   registration: 'key',
@@ -89,6 +130,45 @@ export default {
       type: Object,
       required: true,
     },
+  },
+
+  emits: ['update:agendaItem', 'remove'],
+
+  data() {
+    return {
+      internalAgendaItem: { ...this.agendaItem },
+    };
+  },
+
+  watch: {
+    internalAgendaItem: {
+      deep: true,
+      handler() {
+        this.$emit('update:agendaItem', { ...this.internalAgendaItem });
+      },
+    },
+    'internalAgendaItem.startsAt': {
+      handler(newValue, oldValue) {
+        if (!oldValue) {
+          return;
+        }
+
+        this.internalAgendaItem.endsAt = this.calculateNewEndDate(newValue, oldValue);
+      }
+    },
+  },
+
+  methods: {
+    calculateNewEndDate(newStartValue, oldStartValue) {
+      const oldStart = getTimeInMinutes(oldStartValue);
+      const oldEnd = getTimeInMinutes(this.internalAgendaItem.endsAt);
+      const duration = oldEnd - oldStart;
+
+      const newStart = getTimeInMinutes(newStartValue);
+      const newEnd = newStart + duration;
+
+      return getTimeString(newEnd);
+    }
   },
 };
 </script>
