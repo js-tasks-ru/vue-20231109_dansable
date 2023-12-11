@@ -1,31 +1,54 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button
+      type="button"
+      class="agenda-item-form__remove-button"
+      @click="$emit('remove')"
+    >
       <UiIcon icon="trash" />
     </button>
 
     <UiFormGroup>
-      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <UiDropdown
+        title="Тип"
+        :options="$options.agendaItemTypeOptions"
+        name="type"
+        v-model="internalAgendaItem.type"
+      />
     </UiFormGroup>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <UiFormGroup label="Начало">
-          <UiInput type="time" placeholder="00:00" name="startsAt" />
+          <UiInput
+            type="time"
+            placeholder="00:00"
+            name="startsAt"
+            v-model="internalAgendaItem.startsAt"
+          />
         </UiFormGroup>
       </div>
       <div class="agenda-item-form__col">
         <UiFormGroup label="Окончание">
-          <UiInput type="time" placeholder="00:00" name="endsAt" />
+          <UiInput
+            type="time"
+            placeholder="00:00"
+            name="endsAt" v-model="internalAgendaItem.endsAt"
+          />
         </UiFormGroup>
       </div>
     </div>
 
-    <UiFormGroup label="Заголовок">
-      <UiInput name="title" />
-    </UiFormGroup>
-    <UiFormGroup label="Описание">
-      <UiInput multiline name="description" />
+    <UiFormGroup
+      v-for="(schema, field) in $options.agendaItemFormSchemas[internalAgendaItem.type]"
+      :label="schema.label"
+    >
+      <component
+        :is="schema.component"
+        v-model="internalAgendaItem[field]"
+        v-bind="schema.props"
+      >
+      </component>
     </UiFormGroup>
   </fieldset>
 </template>
@@ -35,6 +58,7 @@ import UiIcon from './UiIcon.vue';
 import UiFormGroup from './UiFormGroup.vue';
 import UiInput from './UiInput.vue';
 import UiDropdown from './UiDropdown.vue';
+import { getTimeInMinutes, getTimeString } from "../../03-MeetupAgendaItemForm/utils/time";
 
 const agendaItemTypeIcons = {
   registration: 'key',
@@ -164,6 +188,45 @@ export default {
       type: Object,
       required: true,
     },
+  },
+
+  emits: ['update:agendaItem', 'remove'],
+
+  data() {
+    return {
+      internalAgendaItem: { ...this.agendaItem },
+    };
+  },
+
+  watch: {
+    internalAgendaItem: {
+      deep: true,
+      handler() {
+        this.$emit('update:agendaItem', { ...this.internalAgendaItem });
+      },
+    },
+    'internalAgendaItem.startsAt': {
+      handler(newValue, oldValue) {
+        if (!oldValue) {
+          return;
+        }
+
+        this.internalAgendaItem.endsAt = this.calculateNewEndDate(newValue, oldValue);
+      }
+    },
+  },
+
+  methods: {
+    calculateNewEndDate(newStartValue, oldStartValue) {
+      const oldStart = getTimeInMinutes(oldStartValue);
+      const oldEnd = getTimeInMinutes(this.internalAgendaItem.endsAt);
+      const duration = oldEnd - oldStart;
+
+      const newStart = getTimeInMinutes(newStartValue);
+      const newEnd = newStart + duration;
+
+      return getTimeString(newEnd);
+    }
   },
 };
 </script>
