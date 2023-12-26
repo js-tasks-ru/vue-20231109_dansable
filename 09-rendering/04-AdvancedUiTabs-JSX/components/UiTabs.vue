@@ -22,12 +22,25 @@ export default {
     return (
       <div class="tabs">
         <div class="tabs__nav" role="tablist">
-          <a class="tabs__tab" role="tab">Tab</a>
-          <a class="tabs__tab tabs__tab_active" role="tab">Active Tab</a>
-          <a class="tabs__tab" role="tab">Tab</a>
+          {
+            this.$slots.default?.().filter(vnode => vnode.type.name === 'UiTab').map((vnode) => {
+              return (
+                <a
+                  class={{
+                    tabs__tab: true,
+                    tabs__tab_active: vnode.props.name === this.active,
+                  }}
+                  role="tab"
+                  onClick={() => this.setActive(vnode.props.name)}
+                >
+                  {vnode.props.title}
+                </a>
+              );
+            })
+          }
         </div>
         <div class="tabs__content">
-          ACTIVE TAB CONTENT
+          {this.$slots.default?.().find(vnode => vnode.props.name === this.active)}
         </div>
       </div>
     );

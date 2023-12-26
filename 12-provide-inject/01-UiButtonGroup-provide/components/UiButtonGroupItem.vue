@@ -1,14 +1,35 @@
 <template>
-  <button class="button-group__button button-group__button_active" type="button" aria-selected="false">Button</button>
+  <button
+    class="button-group__button" :class="{
+    'button-group__button_active': active
+  }" type="button" aria-selected="false" @click.stop="select"
+  >
+    <slot />
+  </button>
 </template>
+
 
 <script>
 export default {
   name: 'UiButtonGroupItem',
 
+  inject: ['modelValue', 'update'],
+
   props: {
     value: {
       required: true,
+    },
+  },
+
+  computed: {
+    active() {
+      return this.value === this.modelValue;
+    },
+  },
+
+  methods: {
+    select() {
+      this.update(this.value);
     },
   },
 };

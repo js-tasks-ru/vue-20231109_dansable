@@ -1,8 +1,12 @@
 <template>
-  <UiCalendarView>
-    <UiCalendarEvent v-if="meetups[0]" tag="a" :href="`/meetups/${meetups[0].id}`">
-      {{ meetups[0].title }}
-    </UiCalendarEvent>
+  <UiCalendarView :events="meetups">
+    <template #default="{date}">
+      <UiCalendarEvent
+        :key="meetup.id" v-for="meetup in meetupsMap[date.toLocaleDateString()]" tag="a" :href="`/meetups/${meetup.id}`"
+      >
+        {{ meetup.title }}
+      </UiCalendarEvent>
+    </template>
   </UiCalendarView>
 </template>
 
@@ -22,6 +26,22 @@ export default {
     meetups: {
       type: Array,
       required: true,
+    },
+  },
+
+  computed: {
+    meetupsMap() {
+      return this.meetups.reduce((acc, meetup) => {
+        const date = new Date(meetup.date).toLocaleDateString();
+
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+
+        acc[date].push(meetup);
+
+        return acc;
+      }, {});
     },
   },
 };
