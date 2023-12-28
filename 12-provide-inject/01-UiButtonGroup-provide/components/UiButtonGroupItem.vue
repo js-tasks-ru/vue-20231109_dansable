@@ -13,7 +13,7 @@
 export default {
   name: 'UiButtonGroupItem',
 
-  inject: ['modelValue', 'update'],
+  inject: ['selected', 'updateSelected'],
 
   props: {
     value: {
@@ -23,13 +23,13 @@ export default {
 
   computed: {
     active() {
-      return this.value === this.modelValue;
+      return this.value === this.selected;
     },
   },
 
   methods: {
     select() {
-      this.update(this.value);
+      this.updateSelected(this.value);
     },
   },
 };

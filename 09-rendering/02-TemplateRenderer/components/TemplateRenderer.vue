@@ -24,19 +24,23 @@ export default {
   computed: {
     renderFn() {
       return compile(this.template);
+    },
+    component() {
+      return defineComponent({
+        props: {
+          bindings: {
+            type: Object,
+            default: () => ({}),
+          },
+        },
+        components: this.components,
+        render: this.renderFn,
+      });
     }
   },
 
   render() {
-    const component = defineComponent({
-      props: {
-        bindings: this.bindings,
-      },
-      components: this.components,
-      render: this.renderFn,
-    });
-
-    return h(component, { bindings: this.bindings });
+    return h(this.component, { bindings: this.bindings });
   },
 };
 </script>

@@ -18,8 +18,8 @@ export default {
 
   provide() {
     return {
-      modelValue: computed(() => this.modelValue),
-      update: this.update,
+      selected: computed(() => this.modelValue),
+      updateSelected: this.update,
     };
   },
 
